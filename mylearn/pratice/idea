@@ -1,0 +1,6 @@
+#handwritten digit recognition
+##let the text content to be digit data
+
+#Convolutional Neural Network
+##let the text sentence to be short by tf.nn.max_pool //p81 top
+just get the hot word
