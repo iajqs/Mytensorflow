@@ -11,14 +11,15 @@ x = tf.placeholder(tf.float32, [None, 784])
 w = tf.Variable(tf.zeros([784, 10]))
 #set the bia, the label's number is 10, so set 10 bias too.
 b = tf.Variable(tf.zeros([10]))
-#y is the trainResult
+#the train model
+##y is the trainResult
 ##y = softmax(Wx+b) in TensorFlow the y as the result of this formula
 y = tf.nn.softmax(tf.matmul(x, w) + b)
 #cross-entropy in TensorFlow
 ##y_ is the real label
 y_ = tf.placeholder(tf.float32, [None, 10])
 cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
-#the machine for training
+#once train
 train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
 #initialize the global variables
 tf.global_variables_initializer().run()

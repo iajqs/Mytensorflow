@@ -2,6 +2,7 @@ import numpy as np
 import sklearn.preprocessing as prep
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
+import matplotlib.pyplot as plt
 
 #make the weight no height or light
 ##fan_in is the number of input node
@@ -47,8 +48,7 @@ class AdditiveGaussianNoiseAutoencoder(object):
         #define a lose fuction
         ##the Squared Error as the cost
         self.cost = 0.5 * tf.reduce_sum(tf.pow(tf.subtract(
-            self.reconstruction, self.x), 2.0
-        ))
+            self.reconstruction, self.x), 2.0))   #tf.reduce_mean
         ##use the optimizer to optimize the cost
         self.optimizer = optimizer.minimize(self.cost)
 
@@ -73,6 +73,7 @@ class AdditiveGaussianNoiseAutoencoder(object):
                                                      self.n_input], dtype = tf.float32))
         all_weights['b2'] = tf.Variable(tf.zeros([self.n_input],
                                                  dtype = tf.float32))
+
         return all_weights
 
     # caculate the cost and run the optimizer
@@ -134,7 +135,7 @@ X_train, X_test = standard_scale(mnist.train.images, mnist.test.images)
 ##get the samples numbers of train_data
 n_samples = int(mnist.train.num_examples)
 ##the Max training times
-training_epochs = 200
+training_epochs = 20
 ##any random block size
 batch_size = 128
 ##every epoch display the cost once
@@ -150,7 +151,7 @@ for epoch in range(training_epochs):
     avg_cost = 0;
     total_batch = int(n_samples / batch_size)
     for i in range(total_batch):
-        batch_xs = get_random_block_from_data(X_train, batch_size)
+        batch_xs = get_random_block_from_data(X_train, batch_size) # X_train
 
         cost = autoencoder.partial_fit(batch_xs)
         avg_cost += cost / n_samples * batch_size
@@ -159,7 +160,14 @@ for epoch in range(training_epochs):
         print("Epoch:",'%04d' % (epoch + 1), "cost=",
               "{:.9f}".format(avg_cost))
 
-print("Total cost: " + str(autoencoder.calc_total_cost(X_test)))
+print("Total cost: " + str(autoencoder.calc_total_cost(X_test))) #X_test
 
+
+encode_decode = autoencoder.reconstruct(X_test)
+f, a = plt.subplots(2, 10, figsize=(10, 2))
+for i in range(10):
+    a[0][i].imshow(np.reshape(mnist.test.images[i], (28, 28)))
+    a[1][i].imshow(np.reshape(encode_decode[i], (28, 28)))
+plt.show()
 
 
