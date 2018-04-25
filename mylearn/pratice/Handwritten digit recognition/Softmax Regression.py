@@ -25,10 +25,10 @@ train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
 tf.global_variables_initializer().run()
 #train
 for i in range(1000):
-        batch_xs, batch_ys = mnist.train.next_batch(100)
-        ##this x is for the upper x
-        ##this y_ is for the upper y_
-        train_step.run({x:batch_xs,y_:batch_ys})
+    batch_xs, batch_ys = mnist.train.next_batch(100)
+    ##this x is for the upper x
+    ##this y_ is for the upper y_
+    train_step.run({x:batch_xs,y_:batch_ys})
 
 
 #this y is come from upper y, and the upper y is come from the train_step.run, is the python is caculate from the last to first line?
