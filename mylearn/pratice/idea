@@ -4,3 +4,6 @@
 #Convolutional Neural Network
 ##let the text sentence to be short by tf.nn.max_pool //p81 top
 just get the hot word
+
+#soundex
+##let the word to be the sound, and then use this new data to the CNN 
