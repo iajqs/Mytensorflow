@@ -6,4 +6,7 @@
 just get the hot word
 
 #soundex
-##let the word to be the sound, and then use this new data to the CNN 
+##let the word to be the sound, and then use this new data to the CNN
+
+#word2vec
+##use the word2vec to caculate the sentence similarity

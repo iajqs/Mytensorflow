@@ -231,47 +231,18 @@ with graph.as_default():
 
 
 #the run time
-num_steps = 100001
+num_steps = 10001
+re_embedding = normalized_embeddings
 with tf.Session(graph=graph) as session:
     init.run()
-    print("Initialized")
-
-    average_loss = 0
-    for step in range(num_steps):
-        batch_inputs, batch_labels = generate_batch(
-            batch_size, num_skips, skip_window
-        )
-        feed_dict = {train_inputs: batch_inputs, train_labels: batch_labels}
-
-        _, loss_val = session.run([optimizer, loss], feed_dict=feed_dict)
-        average_loss += loss_val
-
-        if step % 2000 == 0:
-            if step > 0:
-                average_loss /= 2000
-            print("Average loss at step ", step, ":", average_loss)
-            average_loss = 0
-
-        if step % 10000 == 0:
-            sim = similarity.eval()
-            for i in range(valid_size):
-                valid_word = reverse_dictionary[valid_examples[i]]
-                top_k = 8
-                nearest = (-sim[i,:]).argsort()[1:top_k+1]
-                log_str = "Nearest to % s:" % valid_word
-
-                for k in range(top_k):
-                    close_word = reverse_dictionary[nearest[k]]
-                    log_str = "%s %s," % (log_str, close_word)
-                print(log_str)
-    final_embeddings = normalized_embeddings.eval()
-
-    ## save the model
     saver = tf.train.Saver()
-    saver.save(sess=session, save_path="Model/model.ckpt")
-
-
-
+    saver.restore(session, "Model/model.ckpt")
+    batch_inputs, batch_labels = generate_batch(
+        batch_size, num_skips, skip_window
+    )
+    feed_dict = {train_inputs: batch_inputs, train_labels: batch_labels}
+    print(session.run(loss, feed_dict=feed_dict))
+    final_embeddings = normalized_embeddings.eval()
 #this is the plot function
 def plot_with_labels(low_dim_embs, labels, filename = 'tsne.png'):
     assert low_dim_embs.shape[0] >= len(labels), "More labels than embeddings"
