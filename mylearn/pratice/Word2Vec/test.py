@@ -8,3 +8,8 @@ print(zipped)
 # 2
 print(200 // 11) #18
 print(200 / 11) #18.181818181818183
+
+
+print(' '.join(str(i) for i in a))
+print("aa" == "bb")
+print("aa" == "aa")

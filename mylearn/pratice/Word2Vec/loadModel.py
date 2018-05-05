@@ -31,12 +31,12 @@ def maybe_download(filename, expected_bytes):
 ########################################################################################
 
 
-filename = "/home/cks/PycharmProjects/tensorflow/mylearn/pratice/Word2Vec/short.txt"
+filename = "/home/cks/PycharmProjects/tensorflow/mylearn/pratice/Word2Vec/google_sen.txt"
 
 #unpack the data zip
 def read_data(filename):
     with open(filename) as f:
-        data = tf.compat.as_str(f.read()).split()
+        data = tf.compat.as_str(f.read(200000000)).split()
 
     return data
 
@@ -49,7 +49,7 @@ print('Data size', len(words))
 #and then intercept the words
 #mark the other word which is not the top50000 as 0
 ##set the vocabulary size
-vocabulary_size = 5000
+vocabulary_size = 50000
 ##intercept the words and mark the word
 def build_dataset(words):
     ###get the most common words -- top50000(vocabulary_size)
@@ -166,9 +166,9 @@ skip_window = 1
 num_skips = 2
 
 ##the word's number of validate
-valid_size = 16
+valid_size = 20000
 ##the number of frequecest word
-valid_window = 100
+valid_window = 20000
 ##get 16(valid_size) words from frequecest word list(100)
 valid_examples = np.random.choice(valid_window, valid_size, replace=False)
 ##set the noise words' number
@@ -231,38 +231,50 @@ with graph.as_default():
 
 
 #the run time
-num_steps = 10001
 re_embedding = normalized_embeddings
 with tf.Session(graph=graph) as session:
     init.run()
     saver = tf.train.Saver()
-    saver.restore(session, "Model/model.ckpt")
+    saver.restore(session, "Model_google/model.ckpt")
     batch_inputs, batch_labels = generate_batch(
         batch_size, num_skips, skip_window
     )
     feed_dict = {train_inputs: batch_inputs, train_labels: batch_labels}
     print(session.run(loss, feed_dict=feed_dict))
     final_embeddings = normalized_embeddings.eval()
+
+    ## generate the wordList<word, <simLinkedList>>
+    sim = similarity.eval()
+    for i in range(valid_size):
+        valid_word = reverse_dictionary[valid_examples[i]]
+        top_k = 1000
+        nearest = (-sim[i, :]).argsort()[1:top_k + 1]
+        nearestList = []
+        for k in range(top_k):
+            close_word = reverse_dictionary[nearest[k]]
+            nearestList.append(close_word)
+        with open('/home/cks/PycharmProjects/MyProject/python/Word2Vec/data/Word2Vec.txt', 'a') as f:
+            f.write(str(valid_word) + ' ' + ' '.join(str(word) for word in nearestList) + '\n')
 #this is the plot function
-def plot_with_labels(low_dim_embs, labels, filename = 'tsne.png'):
-    assert low_dim_embs.shape[0] >= len(labels), "More labels than embeddings"
-    plt.figure(figsize=(18,18))
-    for i, label in enumerate(labels):
-        x, y = low_dim_embs[i, :]
-        plt.scatter(x, y)
-        plt.annotate(label,
-                     xy = (x, y),
-                     xytext = (5, 2),
-                     textcoords = 'offset points',
-                     ha = 'right',
-                     va = 'bottom')
-
-    plt.savefig(filename)
-
-from sklearn.manifold import TSNE
-import matplotlib.pyplot as plt
-tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-plot_only = 150
-low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only,:])
-labels = [reverse_dictionary[i] for i in range(plot_only)]
-plot_with_labels(low_dim_embs, labels)
+# def plot_with_labels(low_dim_embs, labels, filename = 'tsne2.png'):
+#     assert low_dim_embs.shape[0] >= len(labels), "More labels than embeddings"
+#     plt.figure(figsize=(18,18))
+#     for i, label in enumerate(labels):
+#         x, y = low_dim_embs[i, :]
+#         plt.scatter(x, y)
+#         plt.annotate(label,
+#                      xy = (x, y),
+#                      xytext = (5, 2),
+#                      textcoords = 'offset points',
+#                      ha = 'right',
+#                      va = 'bottom')
+#
+#     plt.savefig(filename)
+#
+# from sklearn.manifold import TSNE
+# import matplotlib.pyplot as plt
+# tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
+# plot_only = 100
+# low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only,:])
+# labels = [reverse_dictionary[i] for i in range(plot_only)]
+# plot_with_labels(low_dim_embs, labels)

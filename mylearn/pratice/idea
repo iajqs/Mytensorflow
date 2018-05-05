@@ -10,3 +10,4 @@ just get the hot word
 
 #word2vec
 ##use the word2vec to caculate the sentence similarity
+### at the next time, I think I should filtting the origin data like filt punctuation

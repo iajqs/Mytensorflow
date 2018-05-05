@@ -31,12 +31,12 @@ def maybe_download(filename, expected_bytes):
 ########################################################################################
 
 
-filename = "/home/cks/PycharmProjects/tensorflow/mylearn/pratice/Word2Vec/short.txt"
+filename = "/home/cks/PycharmProjects/tensorflow/mylearn/pratice/Word2Vec/google_sen.txt"
 
 #unpack the data zip
 def read_data(filename):
     with open(filename) as f:
-        data = tf.compat.as_str(f.read()).split()
+        data = tf.compat.as_str(f.read(200000000)).split()
 
     return data
 
@@ -49,7 +49,7 @@ print('Data size', len(words))
 #and then intercept the words
 #mark the other word which is not the top50000 as 0
 ##set the vocabulary size
-vocabulary_size = 5000
+vocabulary_size = 50000
 ##intercept the words and mark the word
 def build_dataset(words):
     ###get the most common words -- top50000(vocabulary_size)
@@ -101,8 +101,7 @@ data_index = 0
 
 ##batch_size: ok, batch_size is batch's szie
 ##num_skips: the number of sample which is generated of one word
-##skip_window is the farthest distance of word's connect
-##Attendtion: this function's parameter must accord with these limit
+##skip_window is the farthest distance of word's connect##Attendtion: this function's parameter must accord with these limit
     ###num_skips <= skip_window x 2
     ###batch_size = k x num_skips ( k belong to Z)
 def generate_batch(batch_size, num_skips, skip_window):
@@ -189,7 +188,7 @@ with graph.as_default():
     ###limit the caculate operation in cpu
     with tf.device('/cpu:0'):
         ####use the tf.random_uniform random generate the word vector(embeddings)
-        ####the vocabulary_size is 5000
+        ####the vocabulary_size is 50000
         ####the number of the vector's dimension is 128
         embeddings = tf.Variable(
             tf.random_uniform([vocabulary_size, embedding_size], -1.0, 1.0)
@@ -231,7 +230,7 @@ with graph.as_default():
 
 
 #the run time
-num_steps = 100001
+num_steps = 1000001
 with tf.Session(graph=graph) as session:
     init.run()
     print("Initialized")
@@ -268,12 +267,12 @@ with tf.Session(graph=graph) as session:
 
     ## save the model
     saver = tf.train.Saver()
-    saver.save(sess=session, save_path="Model/model.ckpt")
+    saver.save(sess=session, save_path="Model_google/model.ckpt")
 
 
 
 #this is the plot function
-def plot_with_labels(low_dim_embs, labels, filename = 'tsne.png'):
+def plot_with_labels(low_dim_embs, labels, filename = 'tsne2.png'):
     assert low_dim_embs.shape[0] >= len(labels), "More labels than embeddings"
     plt.figure(figsize=(18,18))
     for i, label in enumerate(labels):
